@@ -6,6 +6,13 @@ A reproducible workaround for Bluetooth pairing failures between the **Keychron 
 
 > **Warning:** Flashing custom firmware can leave a keyboard unusable. Verify the exact keyboard model, have a recovery plan, and do not flash an image built for another variant. This repository does **not** distribute firmware binaries.
 
+## Documentation
+
+- **[How we diagnosed the failure](docs/DIAGNOSTIC-JOURNAL.md):** Evidence timeline, Windows driver checks, controlled LE 1M versus LE 2M experiments, HCI timeout `0x08`, why we changed ZMK rather than the Windows adapter, and what remains unproven.
+- **[Step-by-step reproduction guide](docs/REPRODUCE.md):** Hardware verification, Keychron/Zephyr/Realtek HAL revisions, baseline and modified firmware builds, Kconfig comparison, Realtek HID flashing, validation, and optional WSL2/BlueZ reproduction.
+
+Start with the reproduction guide if you only want to apply the workaround; the PHY/WSL2 diagnostic is **optional**, not a prerequisite for flashing. These documents describe one successful keyboard test, not a verified universal fix.
+
 ## Tested hardware and software
 
 | Component | Details |
@@ -13,7 +20,7 @@ A reproducible workaround for Bluetooth pairing failures between the **Keychron 
 | Keyboard | Keychron K1 Ultra 8K ANSI with knob |
 | DFU-reported model | `KCZKK18K` |
 | Keyboard USB VID:PID | `3434:1610` |
-| Original reported firmware | `1.0.1-r` |
+| DFU-reported firmware string (post-flash) | `1.0.1-r` |
 | Laptop | Lenovo Legion 5 15ACH6H (82JU) |
 | Built-in Bluetooth | Realtek (`0BDA:4852`, RTL8852A family) |
 | OS | Windows 11 |
