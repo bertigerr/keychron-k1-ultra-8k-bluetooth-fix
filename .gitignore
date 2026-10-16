@@ -1,0 +1,8 @@
+# Keep generated firmware, local build state and temporary workspace out of this repository.
+build/
+app/build/
+*.bin
+*.hex
+*.elf
+*.uf2
+__pycache__/
