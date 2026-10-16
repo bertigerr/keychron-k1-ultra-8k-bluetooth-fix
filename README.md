@@ -96,9 +96,41 @@ This checksum is provided to identify the **tested output**, not as an instructi
 
 ## Flashing and outcome
 
-The custom image was transferred over the keyboard's Realtek HID DFU interface (HID Usage Page `0x008C`, model `KCZKK18K`). The tool reported successful transfer, **CRC verified OK**, and transmission of the `IMAGE_SWITCH` command. After reboot, the keyboard responded to DFU handshake and Bluetooth pairing succeeded. The keyboard subsequently worked over Bluetooth on multiple devices.
+The working firmware was flashed with **`Realtek_HID_flasher.exe`**, the Windows Realtek SC-FWU-over-HID utility from the [community flasher project](https://github.com/komax20000-cloud/KeychronK1Ultra8K/tree/main/tools/flasher). This was **not** an official Keychron firmware updater. Its source should be reviewed before use.
 
-This README deliberately does not include a one-click flash command: firmware flashing should only be attempted after verifying hardware compatibility and an appropriate recovery procedure. The owner reported that Keychron support recommended recovery through Keychron Launcher, but recovery from a firmware image that prevents USB/DFU initialization has **not** been tested.
+### Reproducing the tested USB HID flashing workflow
+
+1. Confirm you have a firmware image **built for K1 Ultra 8K ANSI (`KCZKK18K`)**, not an image intended for a different keyboard or layout. The image used in the successful experiment is identified by its SHA-256 above; it is **not distributed** here.
+2. Connect the keyboard over USB. Close Keychron Launcher and any other application that might access the keyboard's HID interface.
+3. From Windows PowerShell, in the folder containing `Realtek_HID_flasher.exe`, check the DFU HID interface and identify the keyboard:
+
+   ```powershell
+   .\Realtek_HID_flasher.exe handshake
+   ```
+
+   The known-good **post-flash** handshake from this experiment was:
+
+   ```text
+   >> GET_MODEL_INFO (0x60)...
+      model = "KCZKK18K"   fw = "1.0.1-r"
+      dfu_version = 0x0001 enc_mode = 0
+      identity VALID (Keychron K1 Ultra 8K - ANSI)
+   ```
+
+   **Note:** The captured handshake was after flashing; it does not establish the precise pre-flash sequence or prove the keyboard is in a separate hardware bootloader mode.
+4. Only if the model and firmware image are both confirmed compatible, run the flasher with the locally built firmware path:
+
+   ```powershell
+   .\Realtek_HID_flasher.exe flash .\no-auto-phy.bin
+   ```
+
+   `no-auto-phy.bin` is an **example filename** for your own verified build, not a downloadable file from this repository. The tool requests confirmation before uploading.
+5. Do not disconnect the keyboard during the upload, device-side **CRC verification**, or `IMAGE_SWITCH`. The successfully tested run reported `CRC verified OK` and sent `IMAGE_SWITCH` before the keyboard restarted.
+6. After restart, test Bluetooth pairing. In the original experiment, pairing succeeded and the keyboard also worked over Bluetooth on multiple devices.
+
+**DFU entry and the spacebar reset method:** The flashing tool uses the keyboard's Realtek DFU **HID interface** (usage page `0x008C`, model `KCZKK18K`). No use of the physical reset button beneath the spacebar is recorded in the experiment's available command log; the exact button/switch sequence used to expose the DFU interface before flashing cannot be independently reconstructed from that log. Do **not** present the spacebar method as a tested prerequisite. First try the read-only `handshake` while connected over USB; if the interface cannot be found, stop rather than experimenting with an unverified bootloader or image.
+
+**Risk and validation:** A valid model handshake does **not** establish `.bin` compatibility, and a failed update may render the keyboard unusable. The owner reported Keychron support recommending recovery with Keychron Launcher, but recovery when USB/DFU initialization is broken has **not** been tested. This workflow is confirmed on one K1 Ultra 8K ANSI only; independent user confirmations are not yet available.
 
 ## What this does — and does not — prove
 
